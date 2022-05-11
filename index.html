@@ -8,10 +8,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <title>PAC MAN</title>
   </head>
-  <body>
+  <body
+    class="flex justify-center overflow-hidden h-screen bg-gradient-to-b from-blue-500 to-purple-500"
+  >
     <div>
-      <h1>PAC MAN</h1>
-      <canvas id="gameCanvas"></canvas>
+      <h1
+        class="text-center text-slate-400 text-2xl"
+        style="font-family: comic sans MS"
+      >
+        PAC MAN
+      </h1>
+      <canvas id="gameCanvas" class="shadow-lg shadow-black"></canvas>
     </div>
     <script src="src/Game.js" type="module"></script>
   </body>
