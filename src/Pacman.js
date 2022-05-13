@@ -17,6 +17,7 @@ export default class Pacman {
   }
 
   draw(ctx) {
+    this.#move();
     ctx.drawImage(
       this.pacmanImages[this.pacmanImageIndex],
       this.x,
@@ -46,23 +47,84 @@ export default class Pacman {
       pacmanImage4,
     ];
 
-    this.pacmanImageIndex = 2;
+    this.pacmanImageIndex = 0;
   }
 
   #keydown = (event) => {
+    console.log("Pressed:", event.key);
     //up
-    if (event.keyCode == 38) {
-      if (this.currentMovingDirection == MovingDirection.down)
+    if (event.key === "ArrowUp") {
+      if (this.currentMovingDirection === MovingDirection.down)
         this.currentMovingDirection = MovingDirection.up;
+      this.requestedMovingDirection = MovingDirection.up;
+      this.madeFirstMove = true;
     }
     //down
-    if (event.keyCode == 40) {
+    if (event.key === "ArrowDown") {
+      if (this.currentMovingDirection === MovingDirection.up)
+        this.currentMovingDirection = MovingDirection.down;
+      this.requestedMovingDirection = MovingDirection.down;
+      this.madeFirstMove = true;
     }
     //left
-    if (event.keyCode == 37) {
+    if (event.key === "ArrowLeft") {
+      if (this.currentMovingDirection === MovingDirection.right)
+        this.currentMovingDirection = MovingDirection.left;
+      this.requestedMovingDirection = MovingDirection.left;
+      this.madeFirstMove = true;
     }
     //right
-    if (event.keyCode == 39) {
+    if (event.key === "ArrowRight") {
+      if (this.currentMovingDirection === MovingDirection.left)
+        this.currentMovingDirection = MovingDirection.right;
+      this.requestedMovingDirection = MovingDirection.right;
+      this.madeFirstMove = true;
     }
   };
+
+  #move() {
+    if (this.currentMovingDirection !== this.requestedMovingDirection) {
+      // console.log("Requested Moving Direction:", this.requestedMovingDirection);
+      if (
+        Number.isInteger(this.x / this.tileSize) &&
+        Number.isInteger(this.y / this.tileSize)
+      ) {
+        if (
+          !this.tileMap.didCollideWithEnvironment(
+            this.x,
+            this.y,
+            this.requestedMovingDirection
+          )
+        )
+          this.currentMovingDirection = this.requestedMovingDirection;
+      }
+    }
+
+    if (
+      this.tileMap.didCollideWithEnvironment(
+        this.x,
+        this.y,
+        this.currentMovingDirection
+      )
+    ) {
+      return;
+    }
+
+    switch (this.currentMovingDirection) {
+      case MovingDirection.up:
+        this.y -= this.velocity;
+        break;
+      case MovingDirection.down:
+        this.y += this.velocity;
+        break;
+      case MovingDirection.left:
+        this.x -= this.velocity;
+        break;
+      case MovingDirection.right:
+        this.x += this.velocity;
+        break;
+    }
+
+    // console.log("Current Direction:", this.currentMovingDirection);
+  }
 }
