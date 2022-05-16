@@ -14,6 +14,7 @@ export default class TileMap {
   //1-walls
   //0-dots
   //4-pacman
+  //5-empty space
   map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -36,14 +37,16 @@ export default class TileMap {
           this.#drawWall(ctx, column, row, this.tileSize);
         } else if (tile === 0) {
           this.#drawDot(ctx, column, row, this.tileSize);
+        } else {
+          this.#drawBlank(ctx, column, row, this.tileSize);
         }
-        ctx.strokeStyle = "yellow";
-        ctx.strokeRect(
-          column * this.tileSize,
-          row * this.tileSize,
-          this.tileSize,
-          this.tileSize
-        );
+        // ctx.strokeStyle = "yellow";
+        // ctx.strokeRect(
+        //   column * this.tileSize,
+        //   row * this.tileSize,
+        //   this.tileSize,
+        //   this.tileSize
+        // );
       }
     }
     // console.log("draw");
@@ -66,6 +69,11 @@ export default class TileMap {
       size,
       size
     );
+  }
+
+  #drawBlank(ctx, column, row, size) {
+    ctx.fillStyle = "black";
+    ctx.fillRect(column * this.tileSize, row * this.tileSize, size, size);
   }
 
   getPacman(velocity) {
@@ -91,7 +99,9 @@ export default class TileMap {
   }
 
   didCollideWithEnvironment(x, y, direction) {
-    if (direction === null) return;
+    if (direction === null) {
+      return;
+    }
 
     if (
       Number.isInteger(x / this.tileSize) &&
@@ -109,12 +119,12 @@ export default class TileMap {
           row = y / this.tileSize;
           break;
         case MovingDirection.left:
-          nextColumn = x + this.tileSize;
+          nextColumn = x - this.tileSize;
           column = nextColumn / this.tileSize;
           row = y / this.tileSize;
           break;
         case MovingDirection.up:
-          nextRow = y + this.tileSize;
+          nextRow = y - this.tileSize;
           row = nextRow / this.tileSize;
           column = x / this.tileSize;
           break;
@@ -132,6 +142,19 @@ export default class TileMap {
       }
     }
 
+    return false;
+  }
+
+  eatDot(x, y) {
+    const row = y / this.tileSize;
+    const column = x / this.tileSize;
+
+    if (Number.isInteger(row) && Number.isInteger(column)) {
+      if (this.map[row][column] == 0) {
+        this.map[row][column] = 5;
+        return true;
+      }
+    }
     return false;
   }
 }

@@ -11,20 +11,50 @@ export default class Pacman {
     this.currentMovingDirection = null;
     this.requestedMovingDirection = null;
 
+    this.pacmanAnimationTimerDefault = 10;
+    this.pacmanAnimationTimer = null;
+
+    this.pacmanRotation = this.Rotation.right;
+
     document.addEventListener("keydown", this.#keydown);
 
     this.#loadPacmanImages();
   }
 
+  Rotation = {
+    right: 0,
+    down: 1,
+    left: 2,
+    right: 3,
+  };
+
   draw(ctx) {
     this.#move();
+    this.#animate();
+    this.#eatDot();
+
+    const size = this.tileSize / 2;
+
+    ctx.save();
+    ctx.translate(this.x + size, this.y + size);
+    ctx.rotate((this.pacmanRotation * 90 * Math.PI) / 180);
     ctx.drawImage(
       this.pacmanImages[this.pacmanImageIndex],
-      this.x,
-      this.y,
+      -size,
+      -size,
       this.tileSize,
       this.tileSize
     );
+
+    ctx.restore();
+
+    // ctx.drawImage(
+    //   this.pacmanImages[this.pacmanImageIndex],
+    //   this.x,
+    //   this.y,
+    //   this.tileSize,
+    //   this.tileSize
+    // );
   }
 
   #loadPacmanImages() {
@@ -107,24 +137,54 @@ export default class Pacman {
         this.currentMovingDirection
       )
     ) {
+      this.pacmanAnimationTimer = null;
+      this.pacmanImageIndex = 1;
       return;
+    } else if (
+      this.currentMovingDirection != null &&
+      this.pacmanAnimationTimer == null
+    ) {
+      this.pacmanAnimationTimer = this.pacmanAnimationTimerDefault;
     }
 
     switch (this.currentMovingDirection) {
       case MovingDirection.up:
         this.y -= this.velocity;
+        this.pacmanRotation = this.Rotation.up;
         break;
       case MovingDirection.down:
         this.y += this.velocity;
+        this.pacmanRotation = this.Rotation.down;
         break;
       case MovingDirection.left:
         this.x -= this.velocity;
+        this.pacmanRotation = this.Rotation.left;
         break;
       case MovingDirection.right:
         this.x += this.velocity;
+        this.pacmanRotation = this.Rotation.right;
         break;
     }
 
     // console.log("Current Direction:", this.currentMovingDirection);
+  }
+
+  #animate() {
+    if (this.pacmanAnimationTimer == null) {
+      return;
+    }
+    this.pacmanAnimationTimer--;
+    if (this.pacmanAnimationTimer == 0) {
+      this.pacmanAnimationTimer = this.pacmanAnimationTimerDefault;
+      this.pacmanImageIndex++;
+      if (this.pacmanImageIndex == this.pacmanImages.length)
+        this.pacmanImageIndex = 0;
+    }
+  }
+
+  #eatDot() {
+    if (this.tileMap.eatDot(this.x, this.y)) {
+      //play sound
+    }
   }
 }
