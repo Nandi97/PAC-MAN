@@ -14,12 +14,44 @@ export default class Enemy {
       Math.random() * Object.keys(MovingDirection).length
     );
 
-    this.directionTimerDefault = this.#random(10, 50);
+    this.directionTimerDefault = this.#random(10, 25);
   }
 
-  draw(ctx) {
-    this.#move();
+  draw(ctx, pause) {
+    if (!pause) {
+      this.#move();
+      this.#changeDirection();
+    }
+
     ctx.drawImage(this.image, this.x, this.x, this.tileSize, this.tileSize);
+  }
+
+  #changeDirection() {
+    this.directionTimer--;
+    let newMoveDirection = null;
+    if (this.directionTimer == 0) {
+      this.directionTimer = this.directionTimerDefault;
+      newMoveDirection = Math.floor(
+        Math.random() * Object.keys(MovingDirection).length
+      );
+    }
+
+    if (newMoveDirection != null && this.movingDirection != newMoveDirection) {
+      if (
+        Number.isInteger(this.x / this.tileSize) &&
+        Number.isInteger(this.y / this.tileSize)
+      ) {
+        if (
+          !this.tileMap.didCollideWithEnvironment(
+            this.x,
+            this.y,
+            newMoveDirection
+          )
+        ) {
+          this.movingDirection = newMoveDirection;
+        }
+      }
+    }
   }
 
   #move() {
@@ -59,7 +91,7 @@ export default class Enemy {
     this.scaredGhost.src = "../images/scaredGhost.png";
 
     this.scaredGhost2 = new Image();
-    this.scaredGhost2.src = "../images/scaredGhost2.png";
+    this.scaredGhost2.src = "i../mages/scaredGhost2.png";
 
     this.image = this.normalGhost;
   }

@@ -15,7 +15,9 @@ export default class Pacman {
     this.pacmanAnimationTimer = null;
 
     this.pacmanRotation = this.Rotation.right;
-    this.wakaSound = new Audio("../sounds/Waka.wav");
+    this.wakaSound = new Audio("../sounds/waka.wav");
+
+    this.madeFirstMove = false;
 
     document.addEventListener("keydown", this.#keydown);
 
@@ -26,7 +28,7 @@ export default class Pacman {
     right: 0,
     down: 1,
     left: 2,
-    right: 3,
+    up: 3,
   };
 
   draw(ctx) {
@@ -60,16 +62,16 @@ export default class Pacman {
 
   #loadPacmanImages() {
     const pacmanImage1 = new Image();
-    pacmanImage1.src = "images/pac0.png";
+    pacmanImage1.src = "../images/pac0.png";
 
     const pacmanImage2 = new Image();
-    pacmanImage2.src = "images/pac1.png";
+    pacmanImage2.src = "../images/pac1.png";
 
     const pacmanImage3 = new Image();
-    pacmanImage3.src = "images/pac2.png";
+    pacmanImage3.src = "../images/pac2.png";
 
     const pacmanImage4 = new Image();
-    pacmanImage4.src = "images/pac1.png";
+    pacmanImage4.src = "../images/pac1.png";
 
     this.pacmanImages = [
       pacmanImage1,
@@ -115,7 +117,6 @@ export default class Pacman {
 
   #move() {
     if (this.currentMovingDirection !== this.requestedMovingDirection) {
-      // console.log("Requested Moving Direction:", this.requestedMovingDirection);
       if (
         Number.isInteger(this.x / this.tileSize) &&
         Number.isInteger(this.y / this.tileSize)
@@ -166,8 +167,6 @@ export default class Pacman {
         this.pacmanRotation = this.Rotation.right;
         break;
     }
-
-    // console.log("Current Direction:", this.currentMovingDirection);
   }
 
   #animate() {
@@ -184,7 +183,7 @@ export default class Pacman {
   }
 
   #eatDot() {
-    if (this.tileMap.eatDot(this.x, this.y)) {
+    if (this.tileMap.eatDot(this.x, this.y) && this.madeFirstMove) {
       // this.wakaSound.play();
     }
   }
