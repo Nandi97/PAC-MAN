@@ -48,7 +48,7 @@ export default class TileMap {
         } else if (tile === 0) {
           this.#drawDot(ctx, column, row, this.tileSize);
         } else if (tile == 7) {
-          this.#drawPowerDot();
+          this.#drawPowerDot(ctx, column, row, this.tileSize);
         } else {
           this.#drawBlank(ctx, column, row, this.tileSize);
         }
@@ -64,15 +64,6 @@ export default class TileMap {
     }
     // console.log("draw");
   }
-  #drawWall(ctx, column, row, size) {
-    ctx.drawImage(
-      this.wall,
-      column * this.tileSize,
-      row * this.tileSize,
-      size,
-      size
-    );
-  }
 
   #drawDot(ctx, column, row, size) {
     ctx.drawImage(
@@ -87,14 +78,24 @@ export default class TileMap {
   #drawPowerDot(ctx, column, row, size) {
     this.powerDotAnimationTimer--;
     if (this.powerDotAnimationTimer === 0) {
-      this.powerDotAnimationTimer - this.powerDotAnimationTimerDefault;
-      if (this.pinkDot == this.pinkDot) {
-        this.pinkDot = this.yellowDot;
+      this.powerDotAnimationTimer = this.powerDotAnimationTimerDefault;
+      if (this.powerDot == this.pinkDot) {
+        this.powerDot = this.yellowDot;
       } else {
         this.powerDot = this.pinkDot;
       }
     }
     ctx.drawImage(this.powerDot, column * size, row * size, size, size);
+  }
+
+  #drawWall(ctx, column, row, size) {
+    ctx.drawImage(
+      this.wall,
+      column * this.tileSize,
+      row * this.tileSize,
+      size,
+      size
+    );
   }
 
   #drawBlank(ctx, column, row, size) {
@@ -192,11 +193,32 @@ export default class TileMap {
     return false;
   }
 
+  didWin() {
+    return this.#dotsLeft() === 0;
+  }
+
+  #dotsLeft() {
+    return this.map.flat().filter((tile) => tile === 0).length;
+  }
+
   eatDot(x, y) {
     const row = y / this.tileSize;
     const column = x / this.tileSize;
     if (Number.isInteger(row) && Number.isInteger(column)) {
       if (this.map[row][column] === 0) {
+        this.map[row][column] = 5;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  eatPowerDot(x, y) {
+    const row = y / this.tileSize;
+    const column = x / this.tileSize;
+    if (Number.isInteger(row) && Number.isInteger(column)) {
+      const tile = this.map[row][column];
+      if (tile === 7) {
         this.map[row][column] = 5;
         return true;
       }

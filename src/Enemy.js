@@ -15,15 +15,58 @@ export default class Enemy {
     );
 
     this.directionTimerDefault = this.#random(10, 25);
+    this.directionTimer = this.directionTimerDefault;
+
+    this.scaredAboutToExpireTimerDefault = 10;
+    this.scaredAboutToExpireTimer = this.scaredAboutToExpireTimerDefault;
   }
 
-  draw(ctx, pause) {
+  draw(ctx, pause, pacman) {
     if (!pause) {
       this.#move();
       this.#changeDirection();
     }
-
+    this.#setImage(ctx, pacman);
     ctx.drawImage(this.image, this.x, this.x, this.tileSize, this.tileSize);
+  }
+
+  collideWith(pacman) {
+    const size = this.tileSize / 2;
+    if (
+      this.x < pacman.x + size &&
+      this.x + size > pacman.x &&
+      this.y < pacman.y + size &&
+      this.y + size > pacman.y
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  #setImage(ctx, pacman) {
+    if (pacman.powerDotActive) {
+      this.#setImageWhenPowerDotIsActive(pacman);
+    } else {
+      this.image = this.normalGhost;
+    }
+    ctx.drawImage(this.image, this.x, this.y, this.tileSize, this.tileSize);
+  }
+
+  #setImageWhenPowerDotIsActive(pacman) {
+    if (pacman.powerDotAboutToExpire) {
+      this.scaredAboutToExpireTimer--;
+      if (this.scaredAboutToExpireTimer === 0) {
+        this.scaredAboutToExpireTimer = this.scaredAboutToExpireTimerDefault;
+        if (this.image === this.scaredGhost) {
+          this.image = this.scaredGhost2;
+        } else {
+          this.image = this.scaredGhost;
+        }
+      }
+    } else {
+      this.image = this.scaredGhost;
+    }
   }
 
   #changeDirection() {
@@ -91,7 +134,7 @@ export default class Enemy {
     this.scaredGhost.src = "../images/scaredGhost.png";
 
     this.scaredGhost2 = new Image();
-    this.scaredGhost2.src = "i../mages/scaredGhost2.png";
+    this.scaredGhost2.src = "../images/scaredGhost2.png";
 
     this.image = this.normalGhost;
   }
