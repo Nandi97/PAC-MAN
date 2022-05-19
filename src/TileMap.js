@@ -10,21 +10,22 @@ export default class TileMap {
     this.yellowDot.src = "../images/yellowDot.png";
 
     this.pinkDot = new Image();
-    this.pinkDot.src = "../images/pinkdot.png";
+    this.pinkDot.src = "../images/pinkDot.png";
 
     this.wall = new Image();
     this.wall.src = "../images/wall.png";
 
     this.powerDot = this.pinkDot;
-    this.powerDotAnimationTimerDefault = 30;
-    this.powerDotAnimationTimer = this.powerDotAnimationTimerDefault;
+    this.powerDotAnmationTimerDefault = 30;
+    this.powerDotAnmationTimer = this.powerDotAnmationTimerDefault;
   }
-  //1 - walls
-  //0 - dots
-  //4 - pacman
-  //5 - empty space
-  //6 - enemy
-  //7 - power dot
+
+  // 1 - wall
+  // 0 - dots
+  // 4 - pacman
+  // 5 - empty space
+  // 6 - enemy
+  // 7 - power dot
   map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 7, 0, 0, 4, 0, 0, 0, 0, 0, 0, 7, 1],
@@ -42,16 +43,13 @@ export default class TileMap {
   draw(ctx) {
     for (let row = 0; row < this.map.length; row++) {
       for (let column = 0; column < this.map[row].length; column++) {
-        let tile = this.map[row][column];
-        if (tile === 1) {
-          this.#drawWall(ctx, column, row, this.tileSize);
-        } else if (tile === 0) {
-          this.#drawDot(ctx, column, row, this.tileSize);
-        } else if (tile == 7) {
-          this.#drawPowerDot(ctx, column, row, this.tileSize);
-        } else {
+        const tile = this.map[row][column];
+
+        if (tile === 1) this.#drawWall(ctx, column, row, this.tileSize);
+        if (tile === 0) this.#drawDot(ctx, column, row, this.tileSize);
+        if (tile === 7) this.#drawPowerDot(ctx, column, row, this.tileSize);
+        if (tile !== 1 && tile !== 0 && tile !== 7)
           this.#drawBlank(ctx, column, row, this.tileSize);
-        }
 
         // ctx.strokeStyle = "yellow";
         // ctx.strokeRect(
@@ -62,45 +60,35 @@ export default class TileMap {
         // );
       }
     }
-    // console.log("draw");
+  }
+
+  #drawWall(ctx, column, row, size) {
+    ctx.drawImage(this.wall, column * size, row * size, size, size);
+  }
+
+  #drawBlank(ctx, column, row, size) {
+    ctx.fillStyle = "black";
+    ctx.fillRect(column * size, row * size, size, size);
   }
 
   #drawDot(ctx, column, row, size) {
-    ctx.drawImage(
-      this.yellowDot,
-      column * this.tileSize,
-      row * this.tileSize,
-      size,
-      size
-    );
+    ctx.drawImage(this.yellowDot, column * size, row * size, size, size);
   }
 
   #drawPowerDot(ctx, column, row, size) {
-    this.powerDotAnimationTimer--;
-    if (this.powerDotAnimationTimer === 0) {
-      this.powerDotAnimationTimer = this.powerDotAnimationTimerDefault;
-      if (this.powerDot == this.pinkDot) {
+    this.powerDotAnmationTimer--;
+
+    if (this.powerDotAnmationTimer === 0) {
+      this.powerDotAnmationTimer = this.powerDotAnmationTimerDefault;
+
+      if (this.powerDot === this.pinkDot) {
         this.powerDot = this.yellowDot;
       } else {
         this.powerDot = this.pinkDot;
       }
     }
+
     ctx.drawImage(this.powerDot, column * size, row * size, size, size);
-  }
-
-  #drawWall(ctx, column, row, size) {
-    ctx.drawImage(
-      this.wall,
-      column * this.tileSize,
-      row * this.tileSize,
-      size,
-      size
-    );
-  }
-
-  #drawBlank(ctx, column, row, size) {
-    ctx.fillStyle = "black";
-    ctx.fillRect(column * this.tileSize, row * this.tileSize, size, size);
   }
 
   getPacman(velocity) {
@@ -127,7 +115,8 @@ export default class TileMap {
     for (let row = 0; row < this.map.length; row++) {
       for (let column = 0; column < this.map[row].length; column++) {
         const tile = this.map[row][column];
-        if (tile == 6) {
+
+        if (tile === 6) {
           this.map[row][column] = 0;
           enemies.push(
             new Enemy(
@@ -141,6 +130,7 @@ export default class TileMap {
         }
       }
     }
+
     return enemies;
   }
 
@@ -150,9 +140,7 @@ export default class TileMap {
   }
 
   didCollideWithEnvironment(x, y, direction) {
-    if (direction == null) {
-      return;
-    }
+    if (direction === null) return;
 
     if (
       Number.isInteger(x / this.tileSize) &&
@@ -176,20 +164,20 @@ export default class TileMap {
           break;
         case MovingDirection.up:
           nextRow = y - this.tileSize;
-          row = nextRow / this.tileSize;
           column = x / this.tileSize;
+          row = nextRow / this.tileSize;
           break;
         case MovingDirection.down:
           nextRow = y + this.tileSize;
-          row = nextRow / this.tileSize;
           column = x / this.tileSize;
+          row = nextRow / this.tileSize;
           break;
       }
+
       const tile = this.map[row][column];
-      if (tile === 1) {
-        return true;
-      }
+      if (tile === 1) return true;
     }
+
     return false;
   }
 
@@ -204,6 +192,7 @@ export default class TileMap {
   eatDot(x, y) {
     const row = y / this.tileSize;
     const column = x / this.tileSize;
+
     if (Number.isInteger(row) && Number.isInteger(column)) {
       if (this.map[row][column] === 0) {
         this.map[row][column] = 5;
@@ -216,6 +205,7 @@ export default class TileMap {
   eatPowerDot(x, y) {
     const row = y / this.tileSize;
     const column = x / this.tileSize;
+
     if (Number.isInteger(row) && Number.isInteger(column)) {
       const tile = this.map[row][column];
       if (tile === 7) {
@@ -223,6 +213,7 @@ export default class TileMap {
         return true;
       }
     }
+
     return false;
   }
 }

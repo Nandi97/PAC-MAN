@@ -154,8 +154,8 @@ export default class Pacman {
       this.pacmanImageIndex = 1;
       return;
     } else if (
-      this.currentMovingDirection != null &&
-      this.pacmanAnimationTimer == null
+      this.currentMovingDirection !== null &&
+      !this.pacmanAnimationTimer === null
     ) {
       this.pacmanAnimationTimer = this.pacmanAnimationTimerDefault;
     }
@@ -181,14 +181,13 @@ export default class Pacman {
   }
 
   #animate() {
-    if (this.pacmanAnimationTimer == null) {
-      return;
-    }
+    if (!this.pacmanAnimationTimer) return;
+
     this.pacmanAnimationTimer--;
-    if (this.pacmanAnimationTimer == 0) {
+    if (this.pacmanAnimationTimer === 0) {
       this.pacmanAnimationTimer = this.pacmanAnimationTimerDefault;
       this.pacmanImageIndex++;
-      if (this.pacmanImageIndex == this.pacmanImages.length)
+      if (this.pacmanImageIndex === this.pacmanImages.length)
         this.pacmanImageIndex = 0;
     }
   }

@@ -27,7 +27,7 @@ export default class Enemy {
       this.#changeDirection();
     }
     this.#setImage(ctx, pacman);
-    ctx.drawImage(this.image, this.x, this.x, this.tileSize, this.tileSize);
+    // ctx.drawImage(this.image, this.x, this.x, this.tileSize, this.tileSize);
   }
 
   collideWith(pacman) {
@@ -72,14 +72,17 @@ export default class Enemy {
   #changeDirection() {
     this.directionTimer--;
     let newMoveDirection = null;
-    if (this.directionTimer == 0) {
+    if (this.directionTimer === 0) {
       this.directionTimer = this.directionTimerDefault;
       newMoveDirection = Math.floor(
         Math.random() * Object.keys(MovingDirection).length
       );
     }
 
-    if (newMoveDirection != null && this.movingDirection != newMoveDirection) {
+    if (
+      newMoveDirection !== null &&
+      this.movingDirection !== newMoveDirection
+    ) {
       if (
         Number.isInteger(this.x / this.tileSize) &&
         Number.isInteger(this.y / this.tileSize)
